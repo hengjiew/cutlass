@@ -375,10 +375,11 @@ if(UNIX)
   list(APPEND CUTLASS_CUDA_NVCC_FLAGS -Xcompiler=-fno-strict-aliasing)
 endif()
 
-# Don't leak lineinfo in release builds
+# Always expose line info for study purpose.
+list(APPEND CUTLASS_CUDA_NVCC_FLAGS -lineinfo)
+
 if (NOT CMAKE_BUILD_TYPE MATCHES "Release")
   list(APPEND CUTLASS_CUDA_CLANG_FLAGS -gmlt)
-  list(APPEND CUTLASS_CUDA_NVCC_FLAGS -lineinfo)
 endif()
 
 #Report CUDA build flags
