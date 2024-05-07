@@ -33,7 +33,7 @@
 Please check example 07 and 08 for the basics of tensor op gemm kernels.  On NVIDIA Ampere
 architecture, most concept still holds.  The two main differences are
 
-1. NVIDIA Ampere architecture introduces a new series of tensor core instructions (see 
+1. NVIDIA Ampere architecture introduces a new series of tensor core instructions (see
    include/cutlass/arch/mma_sm80.h) which are more efficient on Ampere.
 
 2. NVIDIA Ampere architecture uses cp_async() to build multistage software pipeline to better hide
@@ -98,7 +98,7 @@ struct Options {
 
   bool reference_check;
   int iterations;
-  
+
   Options():
     help(false),
     problem_size({5120, 4096, 4096}),
@@ -126,7 +126,7 @@ struct Options {
 
     cmd.get_cmd_line_argument("alpha", alpha);
     cmd.get_cmd_line_argument("beta", beta);
-    
+
     cmd.get_cmd_line_argument("iterations", iterations);
 
   }
@@ -155,9 +155,9 @@ struct Options {
   /// Compute performance in GFLOP/s
   double gflops(double runtime_s) const {
 
-    // Number of real-valued multiply-adds 
+    // Number of real-valued multiply-adds
     int64_t fmas = problem_size.product() * batch_count;
-    
+
     // Two flops per multiply-add
     return 2.0 * double(fmas) / double(1.0e9) / runtime_s;
   }
@@ -167,6 +167,9 @@ struct Options {
 
 // The code section below describes datatype for input, output matrices and computation between
 // elements in input matrices.
+template <typename BlockTileShape, typename WarpTileShape>
+int run(Options &options) {
+
 using ElementAccumulator = float;                   // <- data type of accumulator
 using ElementComputeEpilogue = ElementAccumulator;  // <- data type of epilogue operations
 using ElementInputA = float;                        // <- data type of elements in input matrix A
@@ -186,10 +189,10 @@ using MMAOp = cutlass::arch::OpClassTensorOp;
 using SmArch = cutlass::arch::Sm80;
 
 // This code section describes the tile size a thread block will compute
-using ShapeMMAThreadBlock =
-    cutlass::gemm::GemmShape<128, 128, 16>;  // <- threadblock tile M = 128, N = 128, K = 16
+using ShapeMMAThreadBlock = BlockTileShape;  // <- threadblock tile M = 128, N = 128, K = 16
 // This code section describes tile size a warp will compute
-using ShapeMMAWarp = cutlass::gemm::GemmShape<64, 64, 16>;  // <- warp tile M = 64, N = 64, K = 16
+//using ShapeMMAWarp = cutlass::gemm::GemmShape<64, 64, 16>;  // <- warp tile M = 64, N = 64, K = 16
+using ShapeMMAWarp = WarpTileShape;  // <- warp tile M = 64, N = 64, K = 16
 // This code section describes the size of MMA op
 using ShapeMMAOp = cutlass::gemm::GemmShape<16, 8, 8>;  // <- MMA Op tile M = 16, N = 8, K = 8
 
@@ -224,8 +227,6 @@ using Gemm = cutlass::gemm::device::Gemm<ElementInputA,
                                          EpilogueOp,
                                          SwizzleThreadBlock,
                                          NumStages>;
-
-int run(Options &options) {
 
   // Create a tuple of problem size for matrix multiplication
   cutlass::gemm::GemmCoord problem_size = options.problem_size;
@@ -301,7 +302,7 @@ int run(Options &options) {
   // Instantiate CUTLASS kernel depending on templates
   Gemm gemm_op;
 
-  // Check the problem size is supported or not 
+  // Check the problem size is supported or not
   cutlass::Status status = gemm_op.can_implement(arguments);
   CUTLASS_CHECK(status);
 
@@ -421,11 +422,11 @@ int run(Options &options) {
 }
 
 int main(int argc, const char **argv) {
-  
+
   bool notSupported = false;
 
   // Ampere Tensor Core operations exposed with mma.sync and ldmatrix are first available
-  // in CUDA 11.0. 
+  // in CUDA 11.0.
   //
   // CUTLASS must be compiled with CUDA 11.0 Toolkit to run these examples.
   if (!(__CUDACC_VER_MAJOR__ >= 11)) {
@@ -468,5 +469,41 @@ int main(int argc, const char **argv) {
     return -1;
   }
 
-  return run(options);
+  // std::cout << "block tile  128 64 16, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,64,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  256 64 16, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<256,64,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  128 128 16, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,128,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  256 128 16, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<256,128,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  std::cout << "block tile  64 256 16, warp tile 64 64 16\n";
+  run<cutlass::gemm::GemmShape<64,256,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  128 256 16, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,256,16>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  128 64 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,64,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  256 64 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<256,64,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  128 128 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,128,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  256 128 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<256,128,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  64 256 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<64,256,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  // std::cout << "block tile  128 256 32, warp tile 64 64 16\n";
+  // run<cutlass::gemm::GemmShape<128,256,32>, cutlass::gemm::GemmShape<64,64,16> >(options);
+
+  return 0;
 }
