@@ -76,7 +76,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -84,7 +84,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -119,7 +121,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -127,7 +129,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -162,7 +166,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -170,7 +174,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -205,7 +211,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -213,7 +219,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 6
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -253,7 +261,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -261,7 +269,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -296,7 +306,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -304,7 +314,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -339,7 +351,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -347,7 +359,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
@@ -382,7 +396,7 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
   using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<
       cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,
       cutlass::conv::Operator::kWgrad,
-      ElementAcc, cutlass::layout::TensorNWC, 8,
+      ElementAct, cutlass::layout::TensorNWC, 8,
       ElementFlt, cutlass::layout::TensorNWC, 8,
       ElementAcc,
       TileShapeMNK, ClusterShapeMNK,
@@ -390,7 +404,9 @@ TEST(SM90_device_conv1d_wgrad_implicitgemm_f16nwc_f16nwc_f32nwc_tensor_op_f16, 1
       cutlass::conv::collective::KernelScheduleAuto
     >::CollectiveOp;
 
+  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;
   using ConvKernel = cutlass::conv::kernel::ConvUniversal<
+      ProblemShape,
       CollectiveMainloop,
       CollectiveEpilogue
     >;
