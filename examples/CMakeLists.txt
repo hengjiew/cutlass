@@ -1,5 +1,5 @@
 
-# Copyright (c) 2017 - 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2017 - 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
 #
 # Redistribution and use in source and binary forms, with or without
@@ -144,6 +144,8 @@ foreach(EXAMPLE
   62_hopper_sparse_gemm
   63_hopper_gemm_with_weight_prefetch
   64_ada_fp8_gemm_grouped
+  65_distributed_gemm
+  67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling
   )
 
   add_subdirectory(${EXAMPLE})

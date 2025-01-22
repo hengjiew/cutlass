@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright (c) 2023 - 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * Copyright (c) 2023 - 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -112,6 +112,14 @@ struct KernelTmaWarpSpecializedCooperative {
 
 struct KernelPtrArrayTmaWarpSpecializedCooperative { };
 struct KernelPtrArrayTmaWarpSpecializedPingpong { };
+
+// FP8 related policies (including Blocked Scaled Accumulation)
+struct KernelTmaWarpSpecializedCooperativeFP8BlockScaledAccum: KernelTmaWarpSpecializedCooperative { };
+
+// Policies to opt into mixed type GEMMs
+struct KernelTmaWarpSpecializedMixedInput : KernelTmaWarpSpecialized { };
+struct KernelTmaWarpSpecializedPingpongMixedInput : KernelTmaWarpSpecializedPingpong { };
+struct KernelTmaWarpSpecializedCooperativeMixedInput: KernelTmaWarpSpecializedCooperative { };
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -282,6 +290,21 @@ struct MainloopSm90TmaGmmaWarpSpecializedFP8
     "KernelSchedule must be one of the warp specialized policies");
 };
 
+
+// n-buffer in smem (Hopper TMA), pipelined with Hopper GMMA and TMA, Warp specialized dynamic schedule
+// For FP8 kernels with Block Scaling
+template<
+  int Stages_,
+  class ClusterShape_ = Shape<_1,_1,_1>,
+  class KernelSchedule = KernelTmaWarpSpecialized
+>
+struct MainloopSm90TmaGmmaWarpSpecializedBlockScalingFP8
+  : MainloopSm90TmaGmmaWarpSpecialized<Stages_, ClusterShape_, KernelSchedule> {
+  static_assert(
+    cute::is_same_v<KernelSchedule, KernelTmaWarpSpecializedCooperativeFP8BlockScaledAccum>,
+    "KernelSchedule must be one of the warp specialized policies");
+};
+
 // n-buffer in smem (Hopper TMA), pipelined with Hopper GMMA and TMA, Warp specialized dynamic schedule for Ptr-Array and Grouped Gemm
 template<
   int Stages_,
@@ -312,8 +335,17 @@ struct MainloopSm90TmaGmmaWarpSpecializedSparse {
   using Schedule = KernelSchedule;
 };
 
+// For slow-accumulation sparse FP8 kernels
+template<
+  int Stages,
+  class ClusterShape = Shape<_1,_1,_1>,
+  class KernelSchedule = KernelTmaWarpSpecializedCooperative
+>
+struct MainloopSm90TmaGmmaWarpSpecializedSparseFP8 
+  : MainloopSm90TmaGmmaWarpSpecializedSparse<Stages, ClusterShape, KernelSchedule> {
+};
+
 
 //////////////////////////////////////////////////////////////////////////////
 
 } // namespace cutlass::gemm
-

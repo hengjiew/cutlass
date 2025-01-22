@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright (c) 2023 - 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * Copyright (c) 2023 - 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -707,6 +707,23 @@ void cpasync_barrier_arrive(uint64_t const* smem_ptr) {
   asm volatile(
     "{\n\t"
     "cp.async.mbarrier.arrive.shared::cta.b64 [%0];\n\t"
+    "}"
+    :
+    : "r"(smem_addr));
+  cutlass::arch::synclog_emit_cpasync_barrier_arrive(__LINE__, smem_addr);
+#elif defined(__CUDA_ARCH__)
+  asm volatile ("brkpt;\n" ::);
+#endif
+}
+
+// Arrive on completion of in-flight cp.async operations issued by the calling thread (noinc)
+CUTLASS_DEVICE
+void cpasync_barrier_arrive_noinc(uint64_t const* smem_ptr) {
+#if CUDA_BARRIER_ENABLED
+  uint32_t smem_addr = cute::cast_smem_ptr_to_uint(smem_ptr);
+  asm volatile(
+    "{\n\t"
+    "cp.async.mbarrier.arrive.noinc.shared::cta.b64 [%0];\n\t"
     "}"
     :
     : "r"(smem_addr));

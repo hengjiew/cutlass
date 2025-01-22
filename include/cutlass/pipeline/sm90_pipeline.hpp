@@ -1,5 +1,5 @@
 /***************************************************************************************************
- * Copyright (c) 2023 - 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * Copyright (c) 2023 - 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -293,7 +293,8 @@ public:
     uint32_t transaction_bytes = 0;
     ThreadCategory role = ThreadCategory::NonParticipant;
     uint32_t is_leader = 0;
-    uint32_t num_consumers = 0;
+    uint32_t num_consumers = 0; // Number of consumer threads
+    uint32_t num_producers = 1; // Number of producer threads
   };
 
   template <class ClusterShape>
@@ -305,7 +306,7 @@ public:
     bool is_initializing_warp = (warp_idx == 0);
     if (is_initializing_warp) {
       // Barrier FULL and EMPTY init
-      constexpr int producer_arv_cnt = 1;
+      uint32_t const producer_arv_cnt = params.num_producers;
       uint32_t const num_consumer_warpgroups_per_cluster = params.num_consumers / NumThreadsPerWarpGroup;
       uint32_t multicast_consumer_arrival_count = params.num_consumers; // If cluster_size is 1
       if (cute::size(cluster_shape) > 1) {
@@ -316,6 +317,7 @@ public:
       cutlass::arch::detail::initialize_barrier_array_pair_aligned<decltype(storage.full_barrier_), decltype(storage.empty_barrier_), Stages>(
           storage.full_barrier_, storage.empty_barrier_, producer_arv_cnt, multicast_consumer_arrival_count);
     }
+    cutlass::arch::fence_barrier_init();
   }
 
   template<class ClusterShape, class InitBarriers, class InitMasks>
@@ -424,6 +426,12 @@ public:
   CUTLASS_DEVICE
   void producer_commit(PipelineState state, uint32_t bytes) {
     producer_commit(state.index(), bytes);
+  }
+
+  template<class UserDefinedArriveOp>
+  CUTLASS_DEVICE
+  void producer_commit(PipelineState state, UserDefinedArriveOp&& user_defined_arrive_op) {
+    cute::forward<UserDefinedArriveOp>(user_defined_arrive_op)(producer_get_barrier(state.index()));;
   }
 
   // Prevents early exit of producer blocks in Cluster.
@@ -757,6 +765,7 @@ public:
       cutlass::arch::detail::initialize_barrier_array_pair_aligned<decltype(full_barrier_ptr), decltype(empty_barrier_ptr), Stages>(
           full_barrier_ptr, empty_barrier_ptr, params.producer_arv_count, params.consumer_arv_count);
     }
+    cutlass::arch::fence_barrier_init();
   }
 
   // Constructor
@@ -993,6 +1002,7 @@ public:
       cutlass::arch::detail::initialize_barrier_array_pair_aligned<decltype(storage.full_barrier_), decltype(storage.empty_barrier_), Stages>(
           storage.full_barrier_, storage.empty_barrier_, params.producer_arv_count, params.consumer_arv_count);
     }
+    cutlass::arch::fence_barrier_init();
   }
 
   template<class InitBarriers>
@@ -1249,6 +1259,7 @@ public:
         }
       }
     }
+    cutlass::arch::fence_barrier_init();
   }
 
   // Wait on a stage to be unlocked
